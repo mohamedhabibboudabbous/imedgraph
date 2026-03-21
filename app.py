@@ -3,7 +3,7 @@ from itertools import combinations
 
 # ─────────────────────────── PAGE CONFIG ───────────────────────────
 st.set_page_config(
-    page_title="Analyse de Graphes",
+    page_title="Boudabbous — Testeur de Décomposabilité",
     page_icon="🔷",
     layout="wide",
 )
@@ -75,7 +75,108 @@ hr { border-color:#1e3a5f; margin:1.5rem 0; }
     color:#e2e8f0 !important; font-family:'Space Mono',monospace !important;
     border-radius:8px !important; font-size:0.9rem !important;
 }
+
+/* ── WELCOME SCREEN ── */
+.welcome-overlay {
+    position: fixed; inset: 0; z-index: 9999;
+    background: #0b0f1a;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    animation: fadeOut 10s ease 1s forwards;
+    pointer-events: none;
+}
+.welcome-title {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(1.4rem, 4vw, 2.5rem);
+    font-weight: 700;
+    color: #7dd3fc;
+    letter-spacing: -1px;
+    line-height: 1.3;
+    max-width: 700px;
+    padding: 0 2rem;
+    margin-bottom: 1rem;
+}
+.welcome-title span { color: #38bdf8; }
+.welcome-sub {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300; font-size: 1rem;
+    color: #475569;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+.welcome-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #38bdf8;
+    margin: 2rem auto 0;
+    animation: pulse 1s ease infinite;
+}
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.4; transform: scale(0.7); }
+}
+@keyframes fadeOut {
+    to { opacity: 0; pointer-events: none; }
+}
+
+/* ── FLOATING FOOTER ── */
+.floating-footer {
+    position: fixed;
+    bottom: 1.25rem;
+    right: 1.5rem;
+    z-index: 1000;
+    background: rgba(14, 22, 38, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid #1e3a5f;
+    border-radius: 999px;
+    padding: 0.4rem 1.1rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: #38bdf8;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    pointer-events: none;
+    user-select: none;
+}
+.floating-footer span { color: #475569; margin: 0 0.4rem; }
+
+/* bottom padding so content isn't hidden behind footer */
+.main > div { padding-bottom: 4rem; }
 </style>
+""", unsafe_allow_html=True)
+
+# ─────────────────────────── WELCOME SCREEN ────────────────────────
+# shown only once per session via sessionStorage flag (JS-controlled)
+st.markdown("""
+<div class="welcome-overlay" id="welcomeOverlay">
+    <div class="welcome-title">
+        Bienvenue à <span>Boudabbous</span><br>
+        Testeur de Décomposabilité des Graphes
+    </div>
+    <div class="welcome-sub">Analyse · Intervalles · Criticalité</div>
+    <div class="welcome-dot"></div>
+</div>
+<script>
+(function(){
+    var el = document.getElementById('welcomeOverlay');
+    if (!el) return;
+    if (sessionStorage.getItem('welcomed')) {
+        el.style.display = 'none';
+    } else {
+        sessionStorage.setItem('welcomed', '1');
+    }
+})();
+</script>
+""", unsafe_allow_html=True)
+
+# ─────────────────────────── FLOATING FOOTER ───────────────────────
+st.markdown("""
+<div class="floating-footer">
+    🔷<span>·</span>Boudabbous<span>·</span>Testeur de Décomposabilité des Graphes
+</div>
 """, unsafe_allow_html=True)
 
 
@@ -103,10 +204,6 @@ def est_indecomposable(mat):
     return len(trouver_intervalles(mat)) == 0
 
 def afficher_intervalles_st(mat, label="", sommets_originaux=None):
-    """
-    sommets_originaux : liste des indices originaux (1-based) des sommets restants.
-    Si None, on suppose qu'aucun sommet n'a été supprimé (indices 1..n).
-    """
     intervalles = trouver_intervalles(mat)
     n = len(mat)
     if sommets_originaux is None:
@@ -172,7 +269,7 @@ if "n" not in st.session_state:
 # ══════════════════════════════════════════════════════════════════
 if st.session_state.page == "saisie":
 
-    st.markdown('<div class="main-header">🔷 Saisie de la Matrice</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-header">🔷 Boudabbous — Saisie de la Matrice</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-header">Définissez votre graphe avant de lancer l\'analyse</div>', unsafe_allow_html=True)
 
     col_n, _ = st.columns([1, 3])
@@ -250,7 +347,7 @@ elif st.session_state.page == "analyse":
             st.session_state.page = "saisie"
             st.rerun()
     with col_title:
-        st.markdown('<div class="main-header">🔷 Analyse de Décomposition</div>', unsafe_allow_html=True)
+        st.markdown('<div class="main-header">🔷 Boudabbous — Analyse de Décomposition</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="sub-header">Graphes — Intervalles & Criticalité</div>', unsafe_allow_html=True)
 
@@ -332,7 +429,6 @@ elif st.session_state.page == "analyse":
                     st.markdown(f'<div class="pairs-table">{chips}</div>', unsafe_allow_html=True)
                 else:
                     st.markdown('<div class="result-card card-critical">Aucun sommet non critique</div>', unsafe_allow_html=True)
-            # Show intervals for each critical vertex
             if critiques_s:
                 st.markdown("---")
                 st.markdown('<div class="section-title" style="color:#f59e0b;">Détail des intervalles par sommet critique</div>', unsafe_allow_html=True)
@@ -364,7 +460,6 @@ elif st.session_state.page == "analyse":
                     st.markdown(f'<div class="pairs-table">{chips}</div>', unsafe_allow_html=True)
                 else:
                     st.markdown('<div class="result-card card-critical">Aucune paire non critique</div>', unsafe_allow_html=True)
-            # Show intervals for each critical pair
             if critiques:
                 st.markdown("---")
                 st.markdown('<div class="section-title" style="color:#f59e0b;">Détail des intervalles par paire critique</div>', unsafe_allow_html=True)
