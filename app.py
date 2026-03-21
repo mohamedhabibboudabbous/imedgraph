@@ -236,7 +236,7 @@ if "n" not in st.session_state:
 # ─────────────────────────── SIDEBAR ───────────────────────────────
 with st.sidebar:
     st.markdown('<div class="section-title">Paramètres</div>', unsafe_allow_html=True)
-    n = st.number_input("Nombre de sommets n", min_value=2, max_value=10,
+    n = st.number_input("Nombre de sommets n", min_value=2, max_value=100,
                         value=st.session_state.n, step=1)
     st.session_state.n = n
 
